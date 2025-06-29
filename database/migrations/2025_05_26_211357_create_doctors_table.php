@@ -15,6 +15,7 @@ class CreateDoctorsTable extends Migration
         $table->string('working_days');
         $table->enum('period', ['صباحية', 'ظهرية', 'مسائية']);
         $table->string('phone');
+        $table->text('schedule'); // جدول مواعيد ثابت: {"saturday":["morning"],"sunday":["afternoon"]}
         $table->string('image')->nullable();
         $table->timestamps();
     });

@@ -16,3 +16,10 @@ Route::post('/register', [AuthController::class, 'register']);
 
 // Doctor Resource
 Route::resource('doctors', DoctorController::class);
+
+Route::get('/doctors/{doctor}/schedule', [DoctorController::class, 'showSchedule'])
+    ->name('doctors.schedule');
+
+// حجز موعد
+Route::post('/appointments/{appointment}/book', [DoctorController::class, 'bookAppointment'])
+    ->name('appointments.book');

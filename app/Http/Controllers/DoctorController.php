@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Appointment;
 use App\Models\Doctor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -86,5 +87,40 @@ class DoctorController extends Controller
         $doctor->save();
 
         return redirect()->route('doctors.index')->with('success', 'تم تحديث بيانات الطبيب بنجاح');
+        
+            public function showSchedule($doctorId)
+    {
+        $doctor = Doctor::findOrFail($doctorId);
+        $appointments = $doctor->appointments()
+            ->where('date', '>=', now()->format('Y-m-d'))
+            ->where('date', '<=', now()->addWeek()->format('Y-m-d'))
+            ->orderBy('date')
+            ->orderByRaw("FIELD(period, 'صباحية', 'ظهرية', 'مسائية')")
+            ->get();
+
+        return view('doctors.schedule', compact('doctor', 'appointments'));
+    }
+
+    /**
+     * حجز موعد
+     */
+    public function bookAppointment(Request $request, $appointmentId)
+    {
+        $appointment = Appointment::findOrFail($appointmentId);
+
+        // تأكد أن الموعد متاح
+        if ($appointment->booked) {
+            return back()->with('error', 'هذا الموعد محجوز مسبقًا');
+        }
+
+        $appointment->update([
+            'patient_name' => $request->patient_name,
+            'patient_phone' => $request->patient_phone,
+            'booked' => true
+        ]);
+
+        return back()->with('success', 'تم حجز الموعد بنجاح!');
+
+
     }
 }
